@@ -9,14 +9,14 @@
 void nvboard_bind_all_pins(Vtop* top);
 
 void single_cycle(Vtop* top) {
-  top->clk = 0; top->eval();
-  top->clk = 1; top->eval();
+  top->clock = 0; top->eval();
+  top->clock = 1; top->eval();
 }
 
 void reset(Vtop* top, int n) {
-  top->rst = 1;
+  top->reset = 1;
   while (n -- > 0) single_cycle(top);
-  top->rst = 0;
+  top->reset = 0;
 }
 
 int main(int argc, char** argv) {
