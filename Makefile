@@ -32,9 +32,12 @@ endif
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 CSRCS += $(SRC_AUTO_BIND)
 
+test:
+	@sbt "runMain TestMain"
+
 $(CHISEL_VSRCS) &: $(CHISEL_SRCS)
 	@echo "Running Chisel to generate Verilog..."
-	@sbt "runMain Main --target-dir $(CHISEL_OUT)"
+	@sbt "runMain VerilogMain --target-dir $(CHISEL_OUT)"
 
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 
@@ -44,7 +47,7 @@ CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
 $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
-	bear -- verilator --cc --build -j 0 -Wall --trace-fst \
+	bear -- verilator --cc --build -j 0 --trace-fst \
 		--top-module $(TOPNAME) $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE) \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))

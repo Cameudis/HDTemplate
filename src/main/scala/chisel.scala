@@ -1,6 +1,6 @@
 import chisel3._
-// import chisel3.util._
-// import chisel3.tester._
+import chisel3.util._
+import chisel3.simulator.EphemeralSimulator._
 
 class top(b0: Int, b1: Int, b2: Int, b3: Int) extends Module {
   val io = FlatIO(new Bundle {
@@ -16,6 +16,18 @@ class top(b0: Int, b1: Int, b2: Int, b3: Int) extends Module {
   
 }
 
-object Main extends App {
-  emitVerilog(new top(1, 2, 3, 4), Array("--target-dir", "build/gen_vsrc"))
+object VerilogMain extends App {
+  emitVerilog(new top(), Array("--target-dir", "build/gen_vsrc"))
 }
+
+object TestMain extends App {
+  simulate(new LFSR()) { c =>
+    c.reset.poke(true.B)
+    c.clock.step(1)
+    c.reset.poke(false.B)
+    c.io.out.expect(0x01.U)
+    c.clock.step(1)
+    println(s"out = ${c.io.out.peek().litValue}")
+  }
+
+
